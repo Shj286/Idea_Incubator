@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Idea Incubator - Start</title>
+  <!-- Optionally link Bootstrap CSS if desired -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Welcome to Idea Incubator</h1>
+  
+  <div id="signin-section">
+    <h2>Sign In</h2>
+    <input type="text" id="signin-username" placeholder="Username">
+    <br>
+    <input type="password" id="signin-password" placeholder="Password">
+    <br>
+    <button id="btnSignIn">Sign In</button>
+  </div>
+
+  <hr>
+
+  <div id="signup-section">
+    <h2>Sign Up</h2>
+    <input type="text" id="signup-username" placeholder="Username">
+    <br>
+    <input type="password" id="signup-password" placeholder="Password">
+    <br>
+    <input type="text" id="signup-email" placeholder="Email (optional)">
+    <br>
+    <button id="btnSignUp">Sign Up</button>
+  </div>
+
+  <div id="message" style="color:red;"></div>
+
+  <script>
+  // Adjust path as needed:
+  const CONTROLLER = "../controller/controller.php"; 
+  // If your folder structure is different, e.g. "controller/controller.php", use that.
+
+  $("#btnSignIn").on("click", function(){
+    let u = $("#signin-username").val();
+    let p = $("#signin-password").val();
+    $.ajax({
+      url: CONTROLLER,
+      method: 'POST',
+      dataType: 'json',
+      data: {
+        command: "SignIn",
+        username: u,
+        password: p
+      },
+      success: function(resp){
+        if(resp.status === "ok"){
+          // Go to main page
+          window.location.href = "mainpage.html";
+        } else {
+          $("#message").text(resp.msg);
+        }
+      },
+      error: function(){
+        $("#message").text("Ajax error on SignIn.");
+      }
+    });
+  });
+
+  $("#btnSignUp").on("click", function(){
+    let u = $("#signup-username").val();
+    let p = $("#signup-password").val();
+    let e = $("#signup-email").val();
+    
+    // Basic validation
+    if(!u || !p) {
+      $("#message").text("Username and password are required.");
+      return;
+    }
+    
+    $("#message").text("Processing...");
+    
+    $.ajax({
+      url: CONTROLLER,
+      method: 'POST',
+      dataType: 'json',
+      data: {
+        command: "SignUp",
+        username: u,
+        password: p,
+        email: e
+      },
+      success: function(resp){
+        if(resp.status === "ok"){
+          window.location.href = "mainpage.html";
+        } else {
+          $("#message").text(resp.msg);
+        }
+      },
+      error: function(xhr, status, error){
+        console.log("Ajax error:", xhr.responseText);
+        if(xhr.responseText && xhr.responseText.includes("<br />")) {
+          $("#message").text("Server error. Contact administrator.");
+        } else {
+          $("#message").text("Ajax error on SignUp: " + error);
+        }
+      }
+    });
+  });
+  
+  </script>
+</body>
+</html>
