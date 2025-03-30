@@ -73,11 +73,17 @@ function model_create_idea($user_id, $title, $content, $category) {
     $conn = db_connect();
     if (!$conn) return false;
     
-    // Fix: Use the correct field names for Ideas table
+    // Simple sanitization - replace single quotes with double quotes to avoid SQL issues
+    $title = str_replace("'", "\"", $title);
+    $content = str_replace("'", "\"", $content);
+    $category = str_replace("'", "\"", $category);
+    
+    // Use the correct field names for Ideas table
     $sql = "INSERT INTO Ideas (user_id, title, description, category)
             VALUES ($user_id, '$title', '$content', '$category')";
+    
     $res = mysqli_query($conn, $sql);
-    $id  = $res ? mysqli_insert_id($conn) : false;
+    $id = $res ? mysqli_insert_id($conn) : false;
     mysqli_close($conn);
     return $id;
 }
@@ -109,23 +115,15 @@ function model_create_comment($user_id, $idea_id, $content) {
     $conn = db_connect();
     if (!$conn) return false;
     
-    // Log the parameters
-    error_log("Creating comment - user_id: $user_id, idea_id: $idea_id, content: $content");
+    // Simple sanitization to avoid SQL issues
+    $content = str_replace("'", "\"", $content);
     
-    // Fix: Use 'comment_text' instead of 'content'
+    // Use 'comment_text' instead of 'content'
     $sql = "INSERT INTO Comments (idea_id, user_id, comment_text)
             VALUES ($idea_id, $user_id, '$content')";
-    error_log("Comment SQL: $sql");
     
     $res = mysqli_query($conn, $sql);
-    if (!$res) {
-        error_log("Comment creation failed: " . mysqli_error($conn));
-        mysqli_close($conn);
-        return false;
-    }
-    
-    $new_id = mysqli_insert_id($conn);
-    error_log("Comment created with ID: $new_id");
+    $new_id = $res ? mysqli_insert_id($conn) : false;
     mysqli_close($conn);
     return $new_id;
 }
@@ -225,7 +223,12 @@ function model_update_idea($idea_id, $user_id, $new_title, $new_content, $new_ca
     $conn = db_connect();
     if (!$conn) return false;
     
-    // Fix: Use 'id' not 'idea_id', 'description' not 'content'
+    // Simple sanitization
+    $new_title = str_replace("'", "\"", $new_title);
+    $new_content = str_replace("'", "\"", $new_content);
+    $new_category = str_replace("'", "\"", $new_category);
+    
+    // Use 'id' not 'idea_id', 'description' not 'content'
     $sql = "UPDATE Ideas
             SET title='$new_title', description='$new_content', category='$new_category'
             WHERE id=$idea_id AND user_id=$user_id";

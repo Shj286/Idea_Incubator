@@ -1,110 +1,233 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Idea Incubator - Start</title>
-  <!-- Optionally link Bootstrap CSS if desired -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idea Incubator - Welcome</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .header {
+      background-color: #f0f3ff;
+      color: #4c4c4c;
+      padding: 15px;
+      border-radius: 10px 10px 0 0;
+    }
+    .icon {
+      color: #6c63ff;
+      margin-right: 10px;
+    }
+    .btn-primary {
+      background-color: #6c63ff;
+      border: none;
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    .btn-primary:hover {
+      background-color: #5a52d5;
+    }
+    .card-body {
+      padding: 30px;
+    }
+    .form-control {
+      margin-bottom: 15px;
+      padding: 10px;
+    }
+    #message {
+      margin-top: 15px;
+      color: #dc3545;
+    }
+    .sign-up-link {
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to Idea Incubator</h1>
-  
-  <div id="signin-section">
-    <h2>Sign In</h2>
-    <input type="text" id="signin-username" placeholder="Username">
-    <br>
-    <input type="password" id="signin-password" placeholder="Password">
-    <br>
-    <button id="btnSignIn">Sign In</button>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h3>
+          <span class="icon">💡</span>
+          Idea Incubator
+        </h3>
+      </div>
+      <div class="card-body">
+        <h2 class="text-center mb-4">Welcome Back</h2>
+
+        <div id="signin-section">
+          <div class="mb-3">
+            <label for="signin-username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="signin-username" placeholder="Enter your username">
+          </div>
+          <div class="mb-3">
+            <label for="signin-password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="signin-password" placeholder="Enter your password">
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="remember-me">
+            <label class="form-check-label" for="remember-me">Remember me</label>
+            <a href="#" class="float-end">Forgot Password?</a>
+          </div>
+          <button id="btnSignIn" class="btn btn-primary">Log In</button>
+          
+          <div class="sign-up-link">
+            Don't have an account? <a href="#" id="show-signup">Sign Up</a>
+          </div>
+        </div>
+
+        <div id="signup-section" style="display: none;">
+          <div class="mb-3">
+            <label for="signup-username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="signup-username" placeholder="Choose a username">
+          </div>
+          <div class="mb-3">
+            <label for="signup-password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="signup-password" placeholder="Create a password">
+          </div>
+          <div class="mb-3">
+            <label for="signup-email" class="form-label">Email (optional)</label>
+            <input type="email" class="form-control" id="signup-email" placeholder="Enter your email">
+          </div>
+          <button id="btnSignUp" class="btn btn-primary">Sign Up</button>
+          
+          <div class="sign-up-link">
+            Already have an account? <a href="#" id="show-signin">Sign In</a>
+          </div>
+        </div>
+
+        <div id="message" class="text-center"></div>
+      </div>
+    </div>
   </div>
-
-  <hr>
-
-  <div id="signup-section">
-    <h2>Sign Up</h2>
-    <input type="text" id="signup-username" placeholder="Username">
-    <br>
-    <input type="password" id="signup-password" placeholder="Password">
-    <br>
-    <input type="text" id="signup-email" placeholder="Email (optional)">
-    <br>
-    <button id="btnSignUp">Sign Up</button>
-  </div>
-
-  <div id="message" style="color:red;"></div>
 
   <script>
-  // Adjust path as needed:
-  const CONTROLLER = "../controller/controller.php"; 
-  // If your folder structure is different, e.g. "controller/controller.php", use that.
-
-  $("#btnSignIn").on("click", function(){
-    let u = $("#signin-username").val();
-    let p = $("#signin-password").val();
-    $.ajax({
-      url: CONTROLLER,
-      method: 'POST',
-      dataType: 'json',
-      data: {
-        command: "SignIn",
-        username: u,
-        password: p
-      },
-      success: function(resp){
-        if(resp.status === "ok"){
-          // Go to main page
-          window.location.href = "mainpage.html";
-        } else {
-          $("#message").text(resp.msg);
+    // Controller path
+    const CONTROLLER = "../controller/controller.php";
+    
+    // Toggle between sign in and sign up
+    $("#show-signup").on("click", function(e){
+      e.preventDefault();
+      $("#signin-section").hide();
+      $("#signup-section").show();
+      $("#message").text("");
+    });
+    
+    $("#show-signin").on("click", function(e){
+      e.preventDefault();
+      $("#signup-section").hide();
+      $("#signin-section").show();
+      $("#message").text("");
+    });
+    
+    // Sign In function
+    $("#btnSignIn").on("click", function(){
+      let u = $("#signin-username").val();
+      let p = $("#signin-password").val();
+      
+      if(!u || !p) {
+        $("#message").text("Please enter both username and password");
+        return;
+      }
+      
+      $("#message").text("Signing in...");
+      
+      $.ajax({
+        url: CONTROLLER,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+          command: "SignIn",
+          username: u,
+          password: p
+        },
+        success: function(resp){
+          if(resp.status === "ok"){
+            // Go to main page
+            window.location.href = "mainpage.html";
+          } else {
+            $("#message").text(resp.msg);
+          }
+        },
+        error: function(){
+          $("#message").text("Error connecting to server. Please try again.");
         }
-      },
-      error: function(){
-        $("#message").text("Ajax error on SignIn.");
+      });
+    });
+    
+    // Sign Up function
+    $("#btnSignUp").on("click", function(){
+      let u = $("#signup-username").val();
+      let p = $("#signup-password").val();
+      let e = $("#signup-email").val();
+      
+      // Basic validation
+      if(!u || !p) {
+        $("#message").text("Username and password are required");
+        return;
+      }
+      
+      $("#message").text("Processing...");
+      
+      $.ajax({
+        url: CONTROLLER,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+          command: "SignUp",
+          username: u,
+          password: p,
+          email: e
+        },
+        success: function(resp){
+          if(resp.status === "ok"){
+            window.location.href = "mainpage.html";
+          } else {
+            $("#message").text(resp.msg);
+          }
+        },
+        error: function(xhr, status, error){
+          console.log("Ajax error:", xhr.responseText);
+          if(xhr.responseText && xhr.responseText.includes("<br />")) {
+            $("#message").text("Server error. Contact administrator.");
+          } else {
+            $("#message").text("Error during sign up: " + error);
+          }
+        }
+      });
+    });
+    
+    // Add keyboard support for Login/Signup
+    $("#signin-password").on("keypress", function(e) {
+      if(e.which === 13) {
+        $("#btnSignIn").click();
       }
     });
-  });
-
-  $("#btnSignUp").on("click", function(){
-    let u = $("#signup-username").val();
-    let p = $("#signup-password").val();
-    let e = $("#signup-email").val();
     
-    // Basic validation
-    if(!u || !p) {
-      $("#message").text("Username and password are required.");
-      return;
-    }
-    
-    $("#message").text("Processing...");
-    
-    $.ajax({
-      url: CONTROLLER,
-      method: 'POST',
-      dataType: 'json',
-      data: {
-        command: "SignUp",
-        username: u,
-        password: p,
-        email: e
-      },
-      success: function(resp){
-        if(resp.status === "ok"){
-          window.location.href = "mainpage.html";
-        } else {
-          $("#message").text(resp.msg);
-        }
-      },
-      error: function(xhr, status, error){
-        console.log("Ajax error:", xhr.responseText);
-        if(xhr.responseText && xhr.responseText.includes("<br />")) {
-          $("#message").text("Server error. Contact administrator.");
-        } else {
-          $("#message").text("Ajax error on SignUp: " + error);
-        }
+    $("#signup-email").on("keypress", function(e) {
+      if(e.which === 13) {
+        $("#btnSignUp").click();
       }
     });
-  });
-  
   </script>
 </body>
 </html>

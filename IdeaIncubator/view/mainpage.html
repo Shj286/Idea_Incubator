@@ -1,362 +1,755 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Idea Incubator - Main</title>
-  <!-- Optionally include Bootstrap -->
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+    }
+    .navbar {
+      background-color: #f0f3ff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .navbar-brand .icon {
+      color: #6c63ff;
+      margin-right: 8px;
+    }
+    .navbar-brand {
+      color: #4c4c4c;
+      font-weight: 600;
+    }
+    .nav-link {
+      color: #666;
+      font-weight: 500;
+    }
+    .nav-link:hover {
+      color: #6c63ff;
+    }
+    .card {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+      overflow: hidden;
+    }
+    .card-header {
+      background-color: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 15px 20px;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    .idea-card {
+      transition: transform 0.2s;
+    }
+    .idea-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .btn-primary {
+      background-color: #6c63ff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #5a52d5;
+    }
+    .btn-outline-primary {
+      color: #6c63ff;
+      border-color: #6c63ff;
+    }
+    .btn-outline-primary:hover {
+      background-color: #6c63ff;
+    }
+    .category-sidebar {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    }
+    .category-link {
+      color: #666;
+      display: block;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .category-link:hover, .category-link.active {
+      background-color: #f8f9fe;
+      color: #6c63ff;
+      border-left-color: #6c63ff;
+    }
+    .vote-btn {
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #666;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+    .vote-btn:hover {
+      color: #6c63ff;
+    }
+    .comment-section {
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      margin-top: 15px;
+    }
+    .comment-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+    .modal-header {
+      background-color: #f0f3ff;
+    }
+    #message {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      z-index: 1050;
+      max-width: 300px;
+    }
+  </style>
 </head>
 <body>
 
-  <h1>Idea Incubator - Main Page</h1>
-  <button id="btnSignOut">Sign Out</button>
-  <button id="btnEditProfile">Edit Profile</button>
-  <button id="btnUnsubscribe">Unsubscribe</button>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <span class="icon">💡</span> Idea Incubator
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="btnEditProfile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="btnSignOut">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-  <hr>
-
-  <!-- Post Idea Form -->
-  <h2>Post a New Idea</h2>
-  <label>Title: 
-    <input type="text" id="idea-title">
-  </label><br>
-  <label>Content: 
-    <textarea id="idea-content" rows="4" cols="50"></textarea>
-  </label><br>
-  <label>Category:
-    <input type="text" id="idea-category">
-  </label><br>
-  <button id="btnPostIdea">Post Idea</button>
-
-  <hr>
-
-  <h2>All Ideas</h2>
-  <div id="ideas-list">Loading ideas...</div>
-
-  <!-- Hidden Edit Profile form (modal or simple) -->
-  <div id="profile-modal" style="display:none; border:1px solid black; padding:10px;">
-    <h3>Edit Profile</h3>
-    <label>New Password:
-      <input type="password" id="profile-newpass">
-    </label><br>
-    <label>New Email:
-      <input type="text" id="profile-newemail">
-    </label><br>
-    <button id="btnSaveProfile">Save Changes</button>
-    <button id="btnCancelProfile">Cancel</button>
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Sidebar with Categories -->
+      <div class="col-lg-3 mb-4">
+        <div class="category-sidebar p-3 mb-4">
+          <h5 class="mb-3">Categories</h5>
+          <div class="list-group list-group-flush">
+            <a href="#" class="category-link active">Technology</a>
+            <a href="#" class="category-link">Health</a>
+            <a href="#" class="category-link">Education</a>
+            <a href="#" class="category-link">Environment</a>
+          </div>
+        </div>
+        
+        <!-- Post New Idea Card -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Post a New Idea</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="idea-title" class="form-label">Title</label>
+              <input type="text" class="form-control" id="idea-title">
+            </div>
+            <div class="mb-3">
+              <label for="idea-content" class="form-label">Description</label>
+              <textarea class="form-control" id="idea-content" rows="4"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="idea-category" class="form-label">Category</label>
+              <select class="form-select" id="idea-category">
+                <option value="">Select a category</option>
+                <option value="Technology">Technology</option>
+                <option value="Health">Health</option>
+                <option value="Education">Education</option>
+                <option value="Environment">Environment</option>
+                <option value="Business">Business</option>
+                <option value="Art">Art</option>
+                <option value="Social">Social</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <button id="btnPostIdea" class="btn btn-primary w-100">Post Idea</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Content Area -->
+      <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Latest Ideas</h2>
+          <div class="search-container">
+            <div class="input-group">
+              <input type="text" class="form-control" id="idea-search" placeholder="Search ideas...">
+              <button class="btn btn-outline-primary" type="button" id="btnSearch">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ideas List -->
+        <div id="ideas-list" class="ideas-container">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading ideas...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="profile-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="profile-newpass" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="profile-newpass">
+          </div>
+          <div class="mb-3">
+            <label for="profile-newemail" class="form-label">New Email</label>
+            <input type="email" class="form-control" id="profile-newemail">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCancelProfile">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btnSaveProfile">Save Changes</button>
+          <button type="button" class="btn btn-danger" id="btnUnsubscribe">Delete Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal for Unsubscribe -->
+  <div class="modal fade" id="unsubscribe-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmUnsubscribe">Delete Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast message container -->
+  <div id="message" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <!-- Message will be inserted here -->
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
   </div>
 
-  <!-- A place to show messages -->
-  <div id="message" style="color:red;"></div>
-
-<script>
-const CONTROLLER = "../controller/controller.php"; // Adjust if needed
-
-// On page load, load ideas
-$(document).ready(function(){
-  loadIdeas();
-});
-
-// 1) Load ideas from server
-function loadIdeas(){
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    data: { command: "LoadIdeas" },
-    dataType: "json",
-    success: function(resp){
-      renderIdeas(resp);
-    },
-    error: function(){
-      $("#ideas-list").html("Error loading ideas");
-    }
-  });
-}
-
-// 2) Render the list of ideas, each with a comment section, vote button, etc.
-function renderIdeas(ideas){
-  let html = "";
-  ideas.forEach(function(idea){
-    html += `
-      <div style="border:1px solid #aaa; margin:10px; padding:10px;">
-        <h3>${idea.title}</h3>
-        <p>by ${idea.username} - Category: ${idea.category}</p>
-        <p>${idea.description}</p>
-
-        <!-- Voting -->
-        <button class="btnVote" data-idea-id="${idea.id}" data-value="1">Upvote</button>
-        <button class="btnVote" data-idea-id="${idea.id}" data-value="-1">Downvote</button>
-        <span id="vote-score-${idea.id}"> (score unknown)</span>
-        <br><br>
-
-        <!-- Comments -->
-        <button class="btnLoadComments" data-idea-id="${idea.id}">Load Comments</button>
-        <div id="comments-${idea.id}" style="margin-left:25px;">
-          <!-- comments go here -->
-        </div>
-        <br>
-        <textarea id="comment-text-${idea.id}" rows="2" cols="40" placeholder="Add comment"></textarea>
-        <br>
-        <button class="btnComment" data-idea-id="${idea.id}">Post Comment</button>
-      </div>
-    `;
-  });
-
-  $("#ideas-list").html(html);
-
-  // Hook up comment buttons
-  $(".btnComment").on("click", function(){
-    let idea_id = $(this).data("idea-id");
-    postComment(idea_id);
-  });
-
-  // Hook up "Load Comments" buttons
-  $(".btnLoadComments").on("click", function(){
-    let idea_id = $(this).data("idea-id");
-    loadComments(idea_id);
-  });
-
-  // Hook up voting
-  $(".btnVote").on("click", function(){
-    let idea_id = $(this).data("idea-id");
-    let val     = $(this).data("value");
-    voteIdea(idea_id, val);
-  });
-}
-
-// 3) Post a new idea
-$("#btnPostIdea").on("click", function(){
-  let t   = $("#idea-title").val();
-  let c   = $("#idea-content").val();
-  let cat = $("#idea-category").val();
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    data: {
-      command: "PostIdea",
-      title: t,
-      description: c,
-      category: cat
-    },
-    dataType: "json",
-    success: function(resp){
-      if (resp.status==="ok"){
-        $("#message").text("Idea posted!");
-        // Reload the list
-        loadIdeas();
-      } else {
-        $("#message").text(resp.msg);
-      }
-    },
-    error: function(){
-      $("#message").text("Error posting idea.");
-    }
-  });
-});
-
-// 4) Post Comment
-function postComment(idea_id){
-  let content = $(`#comment-text-${idea_id}`).val();
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    data: {
-      command: "PostComment",
-      idea_id: idea_id,
-      comment_text: content
-    },
-    dataType: "json",
-    success: function(resp){
-      if(resp.status==="ok"){
-        $(`#comment-text-${idea_id}`).val("");
-        loadComments(idea_id);
-      } else {
-        $("#message").text(resp.msg);
-      }
-    },
-    error: function(){
-      $("#message").text("Error posting comment.");
-    }
-  });
-}
-
-// 5) Load comments for a single idea
-function loadComments(idea_id){
-  $.ajax({
-    url: CONTROLLER,
-    method: "GET", // you can do GET or POST
-    data: {
-      command: "LoadComments",
-      idea_id: idea_id
-    },
-    dataType: "json",
-    success: function(resp){
-      renderComments(idea_id, resp);
-    },
-    error: function(){
-      $(`#comments-${idea_id}`).html("Error loading comments.");
-    }
-  });
-}
-
-function renderComments(idea_id, comments){
-  let html = "<ul>";
-  comments.forEach(function(c){
-    html += `<li><b>${c.username}:</b> ${c.comment_text} <i>(${c.comment_date})</i></li>`;
-  });
-  html += "</ul>";
-  $(`#comments-${idea_id}`).html(html);
-}
-
-// 6) Vote on an idea
-function voteIdea(idea_id, val){
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    data: {
-      command: "Vote",
-      idea_id: idea_id,
-      vote_value: val
-    },
-    dataType: "json",
-    success: function(resp){
-      if (resp.status==="ok"){
-        let score = resp.score ?? "N/A";
-        $(`#vote-score-${idea_id}`).text(" (score: "+score+")");
-      } else {
-        $("#message").text(resp.msg);
-      }
-    },
-    error: function(){
-      $("#message").text("Error voting on idea.");
-    }
-  });
-}
-
-// 7) Sign Out
-$("#btnSignOut").on("click", function(){
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    data: { command: "SignOut" },
-    dataType: "json",
-    success: function(resp){
-      if(resp.status==="ok"){
-        window.location.href = "startpage.html";
-      } else {
-        $("#message").text(resp.msg);
-      }
-    }
-  });
-});
-
-// 8) Edit Profile
-$("#btnEditProfile").on("click", function(){
-  $("#profile-modal").show();
-});
-
-$("#btnCancelProfile").on("click", function(){
-  $("#profile-modal").hide();
-});
-
-$("#btnSaveProfile").on("click", function(){
-  let newpass  = $("#profile-newpass").val();
-  let newemail = $("#profile-newemail").val();
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    dataType: "json",
-    data: {
-      command: "UpdateProfile",
-      newpass: newpass,
-      newemail: newemail
-    },
-    success: function(resp){
-      if(resp.status==="ok"){
-        $("#message").text("Profile updated!");
-        $("#profile-modal").hide();
-      } else {
-        $("#message").text(resp.msg);
-      }
-    }
-  });
-});
-
-// 9) Unsubscribe
-$("#btnUnsubscribe").on("click", function(){
-  if(!confirm("Are you sure you want to DELETE your account?")) {
-    return;
-  }
-  $.ajax({
-    url: CONTROLLER,
-    method: "POST",
-    dataType: "json",
-    data: {
-      command: "Unsubscribe"
-    },
-    success: function(resp){
-      if(resp.status==="ok"){
-        alert("Your account has been deleted.");
-        window.location.href = "startpage.html";
-      } else {
-        $("#message").text(resp.msg);
-      }
-    }
-  });
-});
-
-// Example button for editing:
-// <button class="btnEditIdea" data-idea-id="...">Edit Idea</button>
-
-$(".btnEditIdea").on("click", function(){
-    let idea_id = $(this).data("idea-id");
-    // perhaps show a modal with current idea data in text fields
-    // then on "save", do something like:
-  
-    $.ajax({
-      url: CONTROLLER,
-      method: "POST",
-      data: {
-        command: "EditIdea",
-        idea_id: idea_id,
-        title:   "New Title",
-        content: "New Content",
-        category:"New Category"
-      },
-      dataType: "json",
-      success: function(resp) {
-        if(resp.status === "ok"){
-          // reload the idea list or refresh the single idea
-        } else {
-          alert(resp.msg);
-        }
-      }
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const CONTROLLER = "../controller/controller.php"; // Adjust if needed
+    let toastEl = document.getElementById('message');
+    let toast = new bootstrap.Toast(toastEl, {
+      delay: 5000
     });
-  });
-  
-  // Example button in each idea block:
-// <button class="btnDeleteIdea" data-idea-id="...">Delete Idea</button>
 
-$(".btnDeleteIdea").on("click", function(){
-    if(!confirm("Are you sure you want to delete this idea?")) return;
-    let idea_id = $(this).data("idea-id");
-    $.ajax({
-      url: CONTROLLER,
-      method: "POST",
-      data: { command:"DeleteIdea", idea_id: idea_id },
-      dataType:"json",
-      success: function(resp){
-        if(resp.status==="ok"){
-          alert("Idea deleted");
-          // reload idea list
-          loadIdeas();
-        } else {
-          alert(resp.msg);
+    // Function to show messages
+    function showMessage(msg, type = 'danger') {
+      const toastEl = document.getElementById('message');
+      toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+      toastEl.classList.add(`bg-${type}`);
+      toastEl.querySelector('.toast-body').textContent = msg;
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    }
+
+    // Store all ideas for searching
+    let allIdeas = [];
+
+    // On page load, load ideas
+    $(document).ready(function(){
+      loadIdeas();
+      
+      // Handle the edit profile button click
+      $("#btnEditProfile").on("click", function(){
+        new bootstrap.Modal(document.getElementById('profile-modal')).show();
+      });
+      
+      // Handle unsubscribe button click (moved to profile modal)
+      $("#btnUnsubscribe").on("click", function(){
+        new bootstrap.Modal(document.getElementById('unsubscribe-modal')).show();
+      });
+
+      // Handle search
+      $("#btnSearch").on("click", function(){
+        searchIdeas();
+      });
+
+      // Search on Enter key press
+      $("#idea-search").on("keypress", function(e){
+        if(e.which === 13) {
+          searchIdeas();
         }
-      }
+      });
+
+      // Also populate the category sidebar from the same list
+      populateCategorySidebar();
     });
-  });
-  
-</script>
+
+    // Function to populate category sidebar with the same options
+    function populateCategorySidebar() {
+      let categoryLinks = '';
+      $("#idea-category option").each(function() {
+        if($(this).val()) { // Skip the empty "Select a category" option
+          categoryLinks += `<a href="#" class="category-link" data-category="${$(this).val()}">${$(this).val()}</a>`;
+        }
+      });
+      $(".list-group").html(categoryLinks);
+      
+      // Set first category as active
+      $(".category-link:first").addClass("active");
+      
+      // Add click handlers to category links
+      $(".category-link").on("click", function(e){
+        e.preventDefault();
+        $(".category-link").removeClass("active");
+        $(this).addClass("active");
+        
+        const category = $(this).data("category");
+        filterIdeasByCategory(category);
+      });
+    }
+
+    // Filter ideas by category
+    function filterIdeasByCategory(category) {
+      if(!category) {
+        renderIdeas(allIdeas);
+        return;
+      }
+      
+      const filteredIdeas = allIdeas.filter(idea => 
+        idea.category.toLowerCase() === category.toLowerCase()
+      );
+      
+      renderIdeas(filteredIdeas);
+      if(filteredIdeas.length === 0) {
+        $("#ideas-list").html('<div class="alert alert-info">No ideas found in this category. Be the first to post!</div>');
+      }
+    }
+
+    // Search ideas function
+    function searchIdeas() {
+      const searchTerm = $("#idea-search").val().trim().toLowerCase();
+      
+      if(!searchTerm) {
+        renderIdeas(allIdeas);
+        return;
+      }
+      
+      try {
+        // Use regex for more advanced search
+        const regex = new RegExp(searchTerm, 'i');
+        
+        const filteredIdeas = allIdeas.filter(idea => 
+          regex.test(idea.title) || 
+          regex.test(idea.description) || 
+          regex.test(idea.username) ||
+          regex.test(idea.category)
+        );
+        
+        renderIdeas(filteredIdeas);
+        if(filteredIdeas.length === 0) {
+          $("#ideas-list").html('<div class="alert alert-info">No ideas match your search criteria.</div>');
+        }
+      } catch(e) {
+        // Handle invalid regex
+        showMessage("Invalid search pattern. Please try a simpler search.", "warning");
+      }
+    }
+
+    // 1) Load ideas from server
+    function loadIdeas(){
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        data: { command: "LoadIdeas" },
+        dataType: "json",
+        success: function(resp){
+          allIdeas = resp; // Store all ideas for searching
+          renderIdeas(resp);
+        },
+        error: function(){
+          $("#ideas-list").html('<div class="alert alert-danger">Error loading ideas</div>');
+        }
+      });
+    }
+
+    // 2) Render the list of ideas, each with a comment section, vote button, etc.
+    function renderIdeas(ideas){
+      if (ideas.length === 0) {
+        $("#ideas-list").html('<div class="alert alert-info">No ideas found. Be the first to post!</div>');
+        return;
+      }
+
+      let html = "";
+      ideas.forEach(function(idea){
+        html += `
+          <div class="card idea-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <div>
+                <h4 class="mb-0">${idea.title}</h4>
+                <div class="text-muted small">
+                  by ${idea.username} · Category: ${idea.category}
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <p>${idea.description}</p>
+              
+              <div class="d-flex align-items-center mt-3">
+                <div class="btn-group me-3">
+                  <button class="btn btn-sm btn-outline-primary btnVote" data-idea-id="${idea.id}" data-value="1">
+                    <i class="bi bi-hand-thumbs-up"></i> Upvote
+                  </button>
+                  <button class="btn btn-sm btn-outline-primary btnVote" data-idea-id="${idea.id}" data-value="-1">
+                    <i class="bi bi-hand-thumbs-down"></i> Downvote
+                  </button>
+                </div>
+                <span class="badge bg-light text-dark" id="vote-score-${idea.id}">Score: calculating...</span>
+              </div>
+              
+              <div class="comment-section mt-4">
+                <button class="btn btn-sm btn-outline-secondary btnLoadComments mb-3" data-idea-id="${idea.id}">
+                  <i class="bi bi-chat-text"></i> View Comments
+                </button>
+                <div id="comments-${idea.id}" style="display: none;">
+                  <!-- comments will be loaded here -->
+                </div>
+                
+                <div class="mt-3">
+                  <div class="input-group">
+                    <textarea class="form-control" id="comment-text-${idea.id}" rows="1" placeholder="Add a comment..."></textarea>
+                    <button class="btn btn-primary btnComment" data-idea-id="${idea.id}">Post</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      $("#ideas-list").html(html);
+
+      // Hook up comment buttons
+      $(".btnComment").on("click", function(){
+        let idea_id = $(this).data("idea-id");
+        postComment(idea_id);
+      });
+
+      // Hook up "Load Comments" buttons
+      $(".btnLoadComments").on("click", function(){
+        let idea_id = $(this).data("idea-id");
+        const commentsContainer = $(`#comments-${idea_id}`);
+        
+        if (commentsContainer.is(":visible")) {
+          commentsContainer.slideUp();
+          $(this).html('<i class="bi bi-chat-text"></i> View Comments');
+        } else {
+          loadComments(idea_id);
+          commentsContainer.slideDown();
+          $(this).html('<i class="bi bi-chat-text-fill"></i> Hide Comments');
+        }
+      });
+
+      // Hook up voting
+      $(".btnVote").on("click", function(){
+        let idea_id = $(this).data("idea-id");
+        let val = $(this).data("value");
+        voteIdea(idea_id, val);
+      });
+      
+      // Load initial vote counts
+      ideas.forEach(function(idea) {
+        updateVoteCount(idea.id);
+      });
+    }
+    
+    // Function to update vote count display
+    function updateVoteCount(idea_id) {
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        data: {
+          command: "GetVoteCount",
+          idea_id: idea_id
+        },
+        dataType: "json",
+        success: function(resp) {
+          if (resp.status === "ok") {
+            $(`#vote-score-${idea_id}`).text(`Score: ${resp.score}`);
+          }
+        }
+      });
+    }
+
+    // 3) Post a new idea
+    $("#btnPostIdea").on("click", function(){
+      let t = $("#idea-title").val();
+      let c = $("#idea-content").val();
+      let cat = $("#idea-category").val();
+      
+      if (!t || !c || !cat) {
+        showMessage("Please fill in all fields");
+        return;
+      }
+      
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        data: {
+          command: "PostIdea",
+          title: t,
+          description: c,
+          category: cat
+        },
+        dataType: "json",
+        success: function(resp){
+          if (resp.status==="ok"){
+            // Clear form
+            $("#idea-title").val("");
+            $("#idea-content").val("");
+            $("#idea-category").val("");
+            
+            showMessage("Idea posted successfully!", "success");
+            
+            // Reload the list
+            loadIdeas();
+          } else {
+            showMessage(resp.msg || "Failed to create idea");
+          }
+        },
+        error: function(){
+          showMessage("Error posting idea");
+        }
+      });
+    });
+
+    // 4) Post Comment
+    function postComment(idea_id){
+      let content = $(`#comment-text-${idea_id}`).val();
+      
+      if (!content.trim()) {
+        showMessage("Comment cannot be empty");
+        return;
+      }
+      
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        data: {
+          command: "PostComment",
+          idea_id: idea_id,
+          comment_text: content
+        },
+        dataType: "json",
+        success: function(resp){
+          if(resp.status==="ok"){
+            $(`#comment-text-${idea_id}`).val("");
+            loadComments(idea_id);
+            showMessage("Comment posted!", "success");
+          } else {
+            showMessage(resp.msg);
+          }
+        },
+        error: function(){
+          showMessage("Error posting comment");
+        }
+      });
+    }
+
+    // 5) Load comments for a single idea
+    function loadComments(idea_id){
+      // Add loading indicator
+      $(`#comments-${idea_id}`).html('<div class="text-center my-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>');
+      
+      $.ajax({
+        url: CONTROLLER,
+        method: "GET",
+        data: {
+          command: "LoadComments",
+          idea_id: idea_id
+        },
+        dataType: "json",
+        success: function(resp){
+          renderComments(idea_id, resp);
+        },
+        error: function(){
+          $(`#comments-${idea_id}`).html('<div class="alert alert-danger">Error loading comments</div>');
+        }
+      });
+    }
+
+    function renderComments(idea_id, comments){
+      if (comments.length === 0) {
+        $(`#comments-${idea_id}`).html('<p class="text-muted">No comments yet. Be the first to comment!</p>');
+        return;
+      }
+      
+      let html = "";
+      comments.forEach(function(c){
+        html += `
+          <div class="comment-item">
+            <div class="d-flex justify-content-between">
+              <strong>${c.username}</strong>
+              <small class="text-muted">${formatDate(c.comment_date)}</small>
+            </div>
+            <p class="mb-0">${c.comment_text}</p>
+          </div>
+        `;
+      });
+      
+      $(`#comments-${idea_id}`).html(html);
+    }
+    
+    // Format date to a friendlier format
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    // 6) Vote on an idea
+    function voteIdea(idea_id, val){
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        data: {
+          command: "Vote",
+          idea_id: idea_id,
+          vote_value: val
+        },
+        dataType: "json",
+        success: function(resp){
+          if (resp.status==="ok"){
+            updateVoteCount(idea_id);
+            showMessage("Vote recorded!", "success");
+          } else {
+            showMessage(resp.msg);
+          }
+        },
+        error: function(){
+          showMessage("Error voting on idea");
+        }
+      });
+    }
+
+    // 7) Sign Out
+    $("#btnSignOut").on("click", function(){
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        data: { command: "SignOut" },
+        dataType: "json",
+        success: function(resp){
+          if(resp.status==="ok"){
+            window.location.href = "startpage.html";
+          } else {
+            showMessage(resp.msg);
+          }
+        }
+      });
+    });
+
+    // 8) Save Profile Changes
+    $("#btnSaveProfile").on("click", function(){
+      let newpass = $("#profile-newpass").val();
+      let newemail = $("#profile-newemail").val();
+      
+      if (!newpass && !newemail) {
+        showMessage("Please enter new password or email");
+        return;
+      }
+      
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        dataType: "json",
+        data: {
+          command: "UpdateProfile",
+          newpass: newpass,
+          newemail: newemail
+        },
+        success: function(resp){
+          if(resp.status==="ok"){
+            showMessage("Profile updated successfully!", "success");
+            bootstrap.Modal.getInstance(document.getElementById('profile-modal')).hide();
+            $("#profile-newpass").val("");
+            $("#profile-newemail").val("");
+          } else {
+            showMessage(resp.msg);
+          }
+        }
+      });
+    });
+
+    // 9) Unsubscribe (Delete Account)
+    $("#btnConfirmUnsubscribe").on("click", function(){
+      $.ajax({
+        url: CONTROLLER,
+        method: "POST",
+        dataType: "json",
+        data: {
+          command: "Unsubscribe"
+        },
+        success: function(resp){
+          if(resp.status==="ok"){
+            window.location.href = "startpage.html";
+          } else {
+            showMessage(resp.msg);
+            bootstrap.Modal.getInstance(document.getElementById('unsubscribe-modal')).hide();
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>

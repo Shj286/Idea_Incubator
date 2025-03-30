@@ -115,7 +115,13 @@ try {
             $description = $_POST['description'] ?? '';
             $cat = $_POST['category'] ?? '';
             $user_id = $_SESSION['user_id'];
-
+            
+            // Basic validation
+            if (empty($title) || empty($description) || empty($cat)) {
+                echo json_encode(["status"=>"error","msg"=>"Title, description and category are required"]);
+                break;
+            }
+            
             $idea_id = model_create_idea($user_id, $title, $description, $cat);
             if ($idea_id) {
                 echo json_encode(["status"=>"ok","msg"=>"Idea created","idea_id"=>$idea_id]);
@@ -171,6 +177,16 @@ try {
             } else {
                 echo json_encode(["status"=>"error","msg"=>"Vote failed"]);
             }
+            break;
+
+        case 'GetVoteCount':
+            $idea_id = $_POST['idea_id'] ?? 0;
+            if (!$idea_id) {
+                echo json_encode(["status"=>"error","msg"=>"Invalid idea ID"]);
+                break;
+            }
+            $score = model_get_vote_count($idea_id);
+            echo json_encode(["status"=>"ok","score"=>$score]);
             break;
 
         case 'DeleteIdea':
