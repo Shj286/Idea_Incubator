@@ -2,7 +2,7 @@
 // db.php: Database connection info and helper function
 
 function db_connect() {
-    // CHANGE to your own credentials:
+
     $host = 'localhost';
     $user = 'w3sjangra';
     $pass = 'w3sjangra136';

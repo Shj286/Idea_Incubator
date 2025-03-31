@@ -281,7 +281,7 @@
   <!-- Bootstrap JS Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const CONTROLLER = "../controller/controller.php"; // Adjust if needed
+    const CONTROLLER = "../controller/controller.php"; 
     let toastEl = document.getElementById('message');
     let toast = new bootstrap.Toast(toastEl, {
       delay: 5000
@@ -319,13 +319,6 @@
         searchIdeas();
       });
 
-      // Search on Enter key press
-      $("#idea-search").on("keypress", function(e){
-        if(e.which === 13) {
-          searchIdeas();
-        }
-      });
-
       // Also populate the category sidebar from the same list
       populateCategorySidebar();
     });
@@ -349,7 +342,7 @@
         $(".category-link").removeClass("active");
         $(this).addClass("active");
         
-        const category = $(this).data("category");
+        const category = $(this).attr("data-category");
         filterIdeasByCategory(category);
       });
     }
@@ -476,13 +469,13 @@
 
       // Hook up comment buttons
       $(".btnComment").on("click", function(){
-        let idea_id = $(this).data("idea-id");
+        let idea_id = $(this).attr("data-idea-id");
         postComment(idea_id);
       });
 
       // Hook up "Load Comments" buttons
       $(".btnLoadComments").on("click", function(){
-        let idea_id = $(this).data("idea-id");
+        let idea_id = $(this).attr("data-idea-id");
         const commentsContainer = $(`#comments-${idea_id}`);
         
         if (commentsContainer.is(":visible")) {
@@ -497,8 +490,8 @@
 
       // Hook up voting
       $(".btnVote").on("click", function(){
-        let idea_id = $(this).data("idea-id");
-        let val = $(this).data("value");
+        let idea_id = $(this).attr("data-idea-id");
+        let val = $(this).attr("data-value");
         voteIdea(idea_id, val);
       });
       
@@ -519,7 +512,7 @@
         },
         dataType: "json",
         success: function(resp) {
-          if (resp.status === "ok") {
+          if (resp.status === "ok") { //200 status_code is "ok"
             $(`#vote-score-${idea_id}`).text(`Score: ${resp.score}`);
           }
         }

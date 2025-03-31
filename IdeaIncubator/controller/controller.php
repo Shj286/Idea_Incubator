@@ -1,26 +1,17 @@
 <?php
-// Prevent PHP errors from breaking JSON responses
-ini_set('display_errors', 0);
-error_reporting(E_ALL);
-
-// Start output buffering to catch any unexpected output
-ob_start();
 
 // controller.php
 session_start();
 require_once("../model/model.php"); // contains our db logic
 
 // If there's no command given, respond with an error or load a default page
-if (!isset($_REQUEST['command'])) {
-    // Possibly include("view/startpage.html"); or just do a message:
+if (!empty($_REQUEST['command'])) {
+   
     echo json_encode(["status"=>"error","msg"=>"No command received"]);
     exit();
 }
 
 $command = $_REQUEST['command'];
-
-// Discard any unexpected output that might have been generated
-ob_clean();
 
 try {
     switch ($command) {
@@ -28,11 +19,10 @@ try {
                     USER COMMANDS
            ==================================== */
         case 'SignIn':
-            $username = $_POST['username'] ?? '';
+            $username = $_POST['username'] ?? ''; // ?? is conditional operator
             $password = $_POST['password'] ?? '';
             $user     = model_check_user($username, $password);
             if ($user) {
-                // store session
                 $_SESSION['user_id']   = $user['user_id'];
                 $_SESSION['username']  = $user['username'];
                 $_SESSION['email']     = $user['email'];
@@ -171,7 +161,6 @@ try {
             $vote_val= $_POST['vote_value'] ?? 1;
             $res     = model_vote($_SESSION['user_id'], $idea_id, $vote_val);
             if ($res) {
-                // Optionally retrieve new total votes
                 $score = model_get_vote_count($idea_id);
                 echo json_encode(["status"=>"ok","msg"=>"Vote success","score"=>$score]);
             } else {
@@ -223,29 +212,6 @@ try {
             }
             break;
 
-        case 'DBTest':
-            // Test database connection and tables
-            $conn = db_connect();
-            if (!$conn) {
-                echo json_encode(['status' => 'error', 'msg' => 'Failed to connect to database']);
-                break;
-            }
-            
-            // Check if tables exist
-            $tables = [];
-            $result = mysqli_query($conn, "SHOW TABLES");
-            while ($row = mysqli_fetch_row($result)) {
-                $tables[] = $row[0];
-            }
-            
-            echo json_encode([
-                'status' => 'ok', 
-                'msg' => 'Database connection successful',
-                'tables' => $tables
-            ]);
-            mysqli_close($conn);
-            break;
-
         default:
             echo json_encode(["status"=>"error","msg"=>"Unknown command"]);
             break;
@@ -256,6 +222,4 @@ try {
     echo json_encode(["status"=>"error","msg"=>"An error occurred processing your request"]);
 }
 
-// End output buffering
-ob_end_flush();
 ?>
