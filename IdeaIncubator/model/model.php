@@ -1,6 +1,6 @@
 <?php
 // model.php
-require_once(__DIR__ . "/db.php");
+require_once("../model/db.php"); 
 
 /* ----------------------------
    USER MANAGEMENT
@@ -137,20 +137,15 @@ function model_get_comments_by_idea($idea_id) {
     $conn = db_connect();
     if (!$conn) return array();
     
-    // Simple echo for debugging
-    // echo "Loading comments for idea_id: $idea_id";
-    
-    // Use 'id' not 'comment_id', 'comment_date' not 'created_at'
     $sql = "SELECT c.*, u.username
             FROM Comments c
             JOIN Users u ON c.user_id = u.user_id
             WHERE c.idea_id=$idea_id
             ORDER BY c.comment_date ASC";
-    // echo "Comments SQL: $sql";
-    
+
     $res = mysqli_query($conn, $sql);
     if (!$res) {
-        // echo "Error loading comments: " . mysqli_error($conn);
+
         mysqli_close($conn);
         return array();
     }
@@ -159,7 +154,6 @@ function model_get_comments_by_idea($idea_id) {
     while ($row = mysqli_fetch_assoc($res)) {
         $comments[] = $row;
     }
-    // echo "Loaded " . count($comments) . " comments";
     mysqli_close($conn);
     return $comments;
 }
@@ -171,34 +165,26 @@ function model_vote($user_id, $idea_id, $vote_value) {
     $conn = db_connect();
     if (!$conn) return false;
     
-    // echo "Processing vote - user_id: $user_id, idea_id: $idea_id";
-    
-    // Use 'id' not 'vote_id'
+    // Check if user already voted for this idea
     $check = "SELECT id FROM Votes 
               WHERE user_id=$user_id AND idea_id=$idea_id";
-    // echo "Vote check SQL: $check";
     
     $cres = mysqli_query($conn, $check);
     if (!$cres) {
-        // echo "Error checking for existing vote: " . mysqli_error($conn);
         mysqli_close($conn);
         return false;
     }
     
     if (mysqli_num_rows($cres) > 0) {
-        // Update existing vote
+        // User already voted, so we'll remove their vote (unlike)
         $row = mysqli_fetch_assoc($cres);
         $vid = $row['id'];
-        // Table doesn't have vote_value in your schema
-        $sql = "UPDATE Votes SET vote_date=NOW() WHERE id=$vid";
-        // echo "Updating vote - SQL: $sql";
+        $sql = "DELETE FROM Votes WHERE id=$vid";
         $res = mysqli_query($conn, $sql);
     } else {
-        // Insert new vote
-        // Table doesn't have vote_value
+        // User hasn't voted, so add their vote (like)
         $sql = "INSERT INTO Votes (user_id, idea_id, vote_date)
                 VALUES ($user_id, $idea_id, NOW())";
-        // echo "Creating vote - SQL: $sql";
         $res = mysqli_query($conn, $sql);
     }
     
@@ -206,24 +192,23 @@ function model_vote($user_id, $idea_id, $vote_value) {
     return $res;
 }
 
-// For convenience, get total upvotes for an idea
+// Count upvotes for an idea
 function model_get_vote_count($idea_id) {
     $conn = db_connect();
     if (!$conn) return 0;
     
-    // Fix: Just count votes, since there's no vote_value field
-    $sql = "SELECT COUNT(*) AS score FROM Votes WHERE idea_id=$idea_id";
+    // Count likes
+    $sql = "SELECT COUNT(*) AS likes FROM Votes WHERE idea_id=$idea_id";
     $res = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($res);
     mysqli_close($conn);
-    return (int)($row['score'] ?? 0);
+    return (int)($row['likes'] ?? 0);
 }
 
 function model_update_idea($idea_id, $user_id, $new_title, $new_content, $new_category) {
     $conn = db_connect();
     if (!$conn) return false;
     
-    // Use 'id' not 'idea_id', 'description' not 'content'
     $sql = "UPDATE Ideas
             SET title='$new_title', description='$new_content', category='$new_category'
             WHERE id=$idea_id AND user_id=$user_id";
@@ -236,7 +221,6 @@ function model_delete_idea($idea_id, $user_id) {
     $conn = db_connect();
     if (!$conn) return false;
     
-    // Use 'id' not 'idea_id'
     $sql = "DELETE FROM Ideas WHERE id=$idea_id AND user_id=$user_id";
     $res = mysqli_query($conn, $sql);
     mysqli_close($conn);

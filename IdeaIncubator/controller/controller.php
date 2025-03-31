@@ -5,7 +5,7 @@ session_start();
 require_once("../model/model.php"); // contains our db logic
 
 // If there's no command given, respond with an error or load a default page
-if (!empty($_REQUEST['command'])) {
+if (empty($_REQUEST['command'])) {
    
     echo json_encode(["status"=>"error","msg"=>"No command received"]);
     exit();
@@ -158,11 +158,10 @@ try {
                 break;
             }
             $idea_id = $_POST['idea_id'] ?? 0;
-            $vote_val= $_POST['vote_value'] ?? 1;
-            $res     = model_vote($_SESSION['user_id'], $idea_id, $vote_val);
+            $res = model_vote($_SESSION['user_id'], $idea_id, 1); // Always use 1 since we only have upvotes now
             if ($res) {
                 $score = model_get_vote_count($idea_id);
-                echo json_encode(["status"=>"ok","msg"=>"Vote success","score"=>$score]);
+                echo json_encode(["status"=>"ok","msg"=>"Vote recorded","score"=>$score]);
             } else {
                 echo json_encode(["status"=>"error","msg"=>"Vote failed"]);
             }
@@ -212,13 +211,25 @@ try {
             }
             break;
 
+        case 'GetCurrentUser':
+            if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
+                echo json_encode(["status"=>"error","msg"=>"Not logged in"]);
+                break;
+            }
+            
+            echo json_encode([
+                "status" => "ok",
+                "user_id" => $_SESSION['user_id'],
+                "username" => $_SESSION['username']
+            ]);
+            break;
+
         default:
             echo json_encode(["status"=>"error","msg"=>"Unknown command"]);
             break;
     }
 } catch (Exception $e) {
-    // Log error but don't expose details to the client
-    error_log("Controller error: " . $e->getMessage());
+    echo "Error: " . $e->getMessage();
     echo json_encode(["status"=>"error","msg"=>"An error occurred processing your request"]);
 }
 
