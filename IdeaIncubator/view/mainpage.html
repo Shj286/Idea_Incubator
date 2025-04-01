@@ -370,7 +370,7 @@ $(document).ready(function(){
     profileModal = new bootstrap.Modal(document.getElementById('profile-modal'));
     unsubscribeModal = new bootstrap.Modal(document.getElementById('unsubscribe-modal'));
       
-    loadIdeas();
+  loadIdeas();
       
     // Store current username in a variable
     window.currentUsername = "";
@@ -416,7 +416,7 @@ $(document).ready(function(){
     });
 
     // Also populate the category sidebar from the same list
-    populateCategorySidebar();
+    populateCategorySidebar(); 
 });
 
 // Function to populate category sidebar with the same options
@@ -435,8 +435,8 @@ function populateCategorySidebar() {
   // Add click handlers to category links
   $(".category-link").on("click", function(e){
     e.preventDefault();
-    $(".category-link").removeClass("active");
-    $(this).addClass("active");
+    $(".category-link").removeClass("active"); //removeClass() is a jQuery method that removes a class from all elements in the set of matched elements
+    $(this).addClass("active"); //addClass() is a jQuery method that adds a class to all elements in the set of matched elements
     
     const category = $(this).attr("data-category");
     filterIdeasByCategory(category);
@@ -595,11 +595,11 @@ function renderIdeas(ideas){
         const commentsContainer = $(`#comments-${idea_id}`);
         
         if (commentsContainer.is(":visible")) {
-          commentsContainer.slideUp();
+          commentsContainer.slideUp(); //slideUp() is a jQuery method that hides the element by sliding it up
           $(this).html('<i class="bi bi-chat-text"></i> View Comments');
         } else {
     loadComments(idea_id);
-          commentsContainer.slideDown();
+          commentsContainer.slideDown(); //slideDown() is a jQuery method that shows the element by sliding it down
           $(this).html('<i class="bi bi-chat-text-fill"></i> Hide Comments');
         }
   });
@@ -614,7 +614,6 @@ function renderIdeas(ideas){
       //  edit idea button
       $(".btnEditIdea").on("click", function(e){
         e.preventDefault();
-        e.stopPropagation();
         
         var idea_id = $(this).attr("data-idea-id");
         var title = $(this).attr("data-title");
@@ -727,7 +726,7 @@ $("#btnPostIdea").on("click", function(){
 function postComment(idea_id){
   let content = $(`#comment-text-${idea_id}`).val();
       
-      if (!content.trim()) {
+      if (!content.trim()) { //trim() removes whitespace from both ends of a string
         showMessage("Comment cannot be empty");
         return;
       }
@@ -845,19 +844,19 @@ function voteIdea(idea_id, val){
 // 7) Sign Out
 $("#btnSignOut").on("click", function(e){
     e.preventDefault();
-    $.ajax({
-        url: CONTROLLER,
-        method: "POST",
-        data: { command: "SignOut" },
-        dataType: "json",
-        success: function(resp){
-            if(resp.status==="ok"){
-                window.location.href = "startpage.html";
-            } else {
+  $.ajax({
+    url: CONTROLLER,
+    method: "POST",
+    data: { command: "SignOut" },
+    dataType: "json",
+    success: function(resp){
+      if(resp.status==="ok"){
+        window.location.href = "startpage.html";
+      } else {
                 showMessage(resp.msg);
-            }
-        }
-    });
+      }
+    }
+  });
 });
 
     // 8) Save Profile Changes
@@ -915,7 +914,6 @@ $("#btnSignOut").on("click", function(e){
     // Update the edit button click handler in renderIdeas function
     $(".btnEditIdea").on("click", function(e){
         e.preventDefault();
-        e.stopPropagation();
         
         var idea_id = $(this).attr("data-idea-id");
         var title = $(this).attr("data-title");
@@ -927,7 +925,7 @@ $("#btnSignOut").on("click", function(e){
         $("#edit-idea-content").val(description);
         $("#edit-idea-category").val(category);
         
-        editModal.show();
+        editModal.show(); 
     });
 
     // Update the save changes button handler
@@ -956,24 +954,24 @@ $("#btnSignOut").on("click", function(e){
             showMessage("Please fill in all fields");
             return;
         }
-    
-        $.ajax({
-            url: CONTROLLER,
-            method: "POST",
-            data: {
-                command: "EditIdea",
-                idea_id: idea_id,
+  
+    $.ajax({
+      url: CONTROLLER,
+      method: "POST",
+      data: {
+        command: "EditIdea",
+        idea_id: idea_id,
                 title: title,
                 description: description,
                 category: category
-            },
-            dataType: "json",
+      },
+      dataType: "json",
             success: function(resp){
                 if (resp.status === "ok"){
                     editModal.hide();
                     showMessage("Idea updated successfully!", "success");
                     loadIdeas();
-                } else {
+        } else {
                     showMessage(resp.msg || "Failed to update idea");
                 }
             },
